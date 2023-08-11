@@ -1,0 +1,48 @@
+{
+    "name": "zhengcai/encrypt",
+    "description": "A simple Laravel SM4 encryption and authentication class.",
+    "type": "library",
+    "keywords": ["laravel", "api", "sign", "verify", "encrypt","SM4"],
+    "homepage": "https://github.com/Jeses/encrypt.git",
+    "version": "1.0.0-alpha",
+    "require": {
+        "php": "^7.3",
+        "firebase/php-jwt": "^6.0",
+        "laravel/framework": "^5.8",
+        "ext-json": "*"
+    },
+    "require-dev": {
+        "php": "^7.3",
+        "firebase/php-jwt": "^6.0",
+        "phpunit/phpunit": "^9.0",
+        "laravel/framework": "^5.8"
+    },
+    "authors": [
+        {
+            "name": "zhengCai",
+            "email": "yz_luck@163.com"
+        }
+    ],
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Zhengcai\\Encrypt\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Zhengcai\\Encrypt\\Tests\\": "tests/"
+        }
+    },
+    "minimum-stability": "dev",
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Zhengcai\\Encrypt\\EncryptServiceProvider"
+            ],
+            "aliases": {
+                "Encrypt": "Zhengcai\\Encrypt\\Facades\\Encrypt"
+            }
+        }
+    }
+}
