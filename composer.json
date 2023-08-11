@@ -8,14 +8,12 @@
     "require": {
         "php": "^7.3",
         "firebase/php-jwt": "^6.0",
-        "laravel/framework": "^5.8",
         "ext-json": "*"
     },
     "require-dev": {
         "php": "^7.3",
         "firebase/php-jwt": "^6.0",
-        "phpunit/phpunit": "^9.0",
-        "laravel/framework": "^5.8"
+        "phpunit/phpunit": "^9.0"
     },
     "authors": [
         {
