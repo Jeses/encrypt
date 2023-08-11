@@ -8,3 +8,4 @@ composer.phar
 composer.lock
 /tests/
 /.idea/php.xml
+.idea/

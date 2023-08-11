@@ -6,14 +6,13 @@
     "homepage": "https://github.com/Jeses/encrypt.git",
     "version": "1.0.0-alpha",
     "require": {
-        "php": "^7.3",
+        "php": "^7.3|^8.0",
         "firebase/php-jwt": "^6.0",
         "ext-json": "*"
     },
     "require-dev": {
-        "php": "^7.3",
-        "firebase/php-jwt": "^6.0",
-        "phpunit/phpunit": "^9.0"
+        "php": "^7.3|^8.0",
+        "firebase/php-jwt": "^6.0"
     },
     "authors": [
         {
