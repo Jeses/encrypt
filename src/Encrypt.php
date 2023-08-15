@@ -90,11 +90,11 @@ class Encrypt
 	{
 		$payload = $this->payload($userId, $DS, $layered);
 		$token = JWT::encode($payload, $this->TOKEN_KEY, $this->TOKEN_ALG);
-		//写入缓存增加一层验证
+		//调用laravel缓存组件，写入缓存增加一层验证
 		try {
 			Cache::put(sprintf($this->TOKEN_PREFIX, $layered, $userId), $token, $this->TOKEN_EXPIRE);
 		}catch (\Exception $exception){
-			throw new Exception('无法写入缓存',9999);
+			throw new Exception('无法写入缓存',99999);
 		}
 		return ['token' =>$token, 'exp' =>$payload['exp'],'cacheKey' => sprintf($this->TOKEN_PREFIX, $layered, $userId)];
 	}
@@ -113,17 +113,24 @@ class Encrypt
 		$payload = JWT::decode($token, new Key($this->TOKEN_KEY, $this->TOKEN_ALG));
 		$cacheKey = sprintf($this->TOKEN_PREFIX, $payload->layered, $payload->userId);
 		if (!Cache::has($cacheKey) || $token != Cache::get($cacheKey)) {
-			throw new Exception('当前token无效.');
+			throw new Exception('当前token无效.',90001);
 		}
 
 		if($payload->exp < time()){
-			throw new Exception('当前token已过期.');
+			throw new Exception('当前token已过期.',90002);
 		}
 
 		// 重置缓存，延长有效时间
 		if($this->TOKEN_RENEW){
-			Cache::put(sprintf($this->TOKEN_PREFIX, $payload->layered, $payload->userId), $token, $this->TOKEN_EXPIRE);
+			try {
+				Cache::put(sprintf($this->TOKEN_PREFIX, $payload->layered, $payload->userId), $token, $this->TOKEN_EXPIRE);
+			}catch (\Exception $exception){
+				throw new Exception('无法续期缓存,请自行续期',99999);
+			}
 		}
+
+		// 销毁iss防止泄露
+		unset($payload->iss);
 
 		return (array)$payload;
 	}
@@ -142,8 +149,12 @@ class Encrypt
 	{
 		//如果当前用户的token和缓存的token一致才可清除
 		$cacheKey = sprintf($this->TOKEN_PREFIX, $layered, $userId);
-		if ($token == Cache::get($cacheKey)) {
-			return Cache::forget(sprintf($this->TOKEN_PREFIX, $layered, $userId));
+		try {
+			if ($token == Cache::get($cacheKey)) {
+				return Cache::forget(sprintf($this->TOKEN_PREFIX, $layered, $userId));
+			}
+		}catch (\Exception $exception){
+			throw new Exception('无法调用laravel组件清除缓存,请自行清除 ',9999);
 		}
 		return true;
 	}
