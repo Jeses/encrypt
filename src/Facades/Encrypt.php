@@ -40,7 +40,7 @@ class Encrypt extends Facade
 		if (isset($data['_sign']))
 			unset($data['_sign']);
 
-		$data['appKey'] = $appKey;
+		$data['_appKey'] = $appKey;
 		$data['_timestamp'] = time();
 		$signStr = $appSecret;
 		ksort($data);
