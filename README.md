@@ -42,6 +42,16 @@ php artisan clear-compiled
             // Encrypt::server('test') 为读取config目录下encrypt.php
             // 如果不想使用此方式 可以 new Encrypt($configArray) 将配置数组传递进去
         
+            // 普通签名算法
+            
+            /**
+             * 签名加密方法  $data 为数据，$appKey 公钥， $appSecret 为私钥
+             * Encrypt::createSign(array $data, string $appKey, string $appSecret)
+             * 
+             * 签名严重方法  $data 为数据，$appSecret 为私钥，$timeDiff 为所允许的时间差
+             * Encrypt::checkVerify(array $data, string $appSecret, $timeDiff = 300)
+             */
+        
             /**
              * Desc: SM4 加密采用ecb 模式 blockSize为16块  
              * 前端可以使用 npm install gm-crypt 

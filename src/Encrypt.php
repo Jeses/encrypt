@@ -66,12 +66,12 @@ class Encrypt
 	{
 		$sm4 = new SM4();
 		$decrypt = $sm4->decrypt($this->TOKEN_KEY, $data);
-		$jsonDecrypt = json_decode($decrypt,true);
+		$jsonDecrypt = json_decode($decrypt, true);
 
 		// return json_last_error() === JSON_ERROR_NONE ? $jsonDecrypt : $decrypt;
-		if(json_last_error() === JSON_ERROR_NONE){
+		if (json_last_error() === JSON_ERROR_NONE) {
 			return $jsonDecrypt;
-		}else{
+		} else {
 			return $decrypt;
 		}
 	}
@@ -79,24 +79,24 @@ class Encrypt
 	/**
 	 * Desc: 生成Jwt Token
 	 * @param string|numeric $userId 用户唯一标识
-	 * @param array $DS      需要生成token的数据
+	 * @param array $DS 需要生成token的数据
 	 * @param string $layered 模块标识
 	 * @return array
 	 * User: 青山有木
 	 * Date: 2023/8/11
 	 * Email: yz_luck@163.com
 	 */
-	public function makeJwtToken( $userId, array $DS, string $layered = 'User'): array
+	public function makeJwtToken($userId, array $DS, string $layered = 'User'): array
 	{
 		$payload = $this->payload($userId, $DS, $layered);
 		$token = JWT::encode($payload, $this->TOKEN_KEY, $this->TOKEN_ALG);
 		//调用laravel缓存组件，写入缓存增加一层验证
 		try {
 			Cache::put(sprintf($this->TOKEN_PREFIX, $layered, $userId), $token, $this->TOKEN_EXPIRE);
-		}catch (\Exception $exception){
-			throw new Exception('无法写入缓存',99999);
+		} catch (\Exception $exception) {
+			throw new Exception('无法写入缓存', 99999);
 		}
-		return ['token' =>$token, 'exp' =>$payload['exp'],'cacheKey' => sprintf($this->TOKEN_PREFIX, $layered, $userId)];
+		return ['token' => $token, 'exp' => $payload['exp'], 'cacheKey' => sprintf($this->TOKEN_PREFIX, $layered, $userId)];
 	}
 
 	/**
@@ -113,19 +113,19 @@ class Encrypt
 		$payload = JWT::decode($token, new Key($this->TOKEN_KEY, $this->TOKEN_ALG));
 		$cacheKey = sprintf($this->TOKEN_PREFIX, $payload->layered, $payload->userId);
 		if (!Cache::has($cacheKey) || $token != Cache::get($cacheKey)) {
-			throw new Exception('当前token无效.',90001);
+			throw new Exception('当前token无效.', 90001);
 		}
 
-		if($payload->exp < time()){
-			throw new Exception('当前token已过期.',90002);
+		if ($payload->exp < time()) {
+			throw new Exception('当前token已过期.', 90002);
 		}
 
 		// 重置缓存，延长有效时间
-		if($this->TOKEN_RENEW){
+		if ($this->TOKEN_RENEW) {
 			try {
 				Cache::put(sprintf($this->TOKEN_PREFIX, $payload->layered, $payload->userId), $token, $this->TOKEN_EXPIRE);
-			}catch (\Exception $exception){
-				throw new Exception('无法续期缓存,请自行续期',99999);
+			} catch (\Exception $exception) {
+				throw new Exception('无法续期缓存,请自行续期', 99999);
 			}
 		}
 
@@ -145,7 +145,7 @@ class Encrypt
 	 * Date: 2023/8/11
 	 * Email: yz_luck@163.com
 	 */
-	public function clearToken($userId,string $token, string $layered = 'User'): bool
+	public function clearToken($userId, string $token, string $layered = 'User'): bool
 	{
 		//如果当前用户的token和缓存的token一致才可清除
 		$cacheKey = sprintf($this->TOKEN_PREFIX, $layered, $userId);
@@ -153,33 +153,33 @@ class Encrypt
 			if ($token == Cache::get($cacheKey)) {
 				return Cache::forget(sprintf($this->TOKEN_PREFIX, $layered, $userId));
 			}
-		}catch (\Exception $exception){
-			throw new Exception('无法调用laravel组件清除缓存,请自行清除 ',9999);
+		} catch (\Exception $exception) {
+			throw new Exception('无法调用laravel组件清除缓存,请自行清除 ', 9999);
 		}
 		return true;
 	}
 
 	/**
 	 * Desc: payload参数生成
-	 * @param string $userId  用户标识
-	 * @param array $DS       用户使用的基础数据
+	 * @param string $userId 用户标识
+	 * @param array $DS 用户使用的基础数据
 	 * @param string $layered 业务标识
 	 * @return array
 	 * User: 青山有木
 	 * Date: 2023/8/11
 	 * Email: yz_luck@163.com
 	 */
-	private function payload(string $userId,array $DS, string $layered): array
+	private function payload(string $userId, array $DS, string $layered): array
 	{
 		$timestamp = time();
-		$map = array(
+		$map = [
 			"iss" => $this->TOKEN_ISS,
 			"exp" => $timestamp + $this->TOKEN_EXPIRE,
 			"userId" => $userId,
 			'layered' => $layered,
-			);
+		];
 
-		return array_merge($map,$DS);
+		return array_merge($map, $DS);
 	}
 
 }
