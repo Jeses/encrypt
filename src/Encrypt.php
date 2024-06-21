@@ -116,8 +116,9 @@ class Encrypt
 			throw new Exception('当前token无效.', 90001);
 		}
 
-		if ($payload->exp < time()) {
-			throw new Exception('当前token已过期.', 90002);
+		$maxExpire = $this->TOKEN_EXPIRE * 3;
+		if ($payload->exp < time() && (time() - $payload->exp) > $maxExpire) {
+			throw new Exception('当前token已超过最长有效期,请重新登录.', 90002);
 		}
 
 		// 重置缓存，延长有效时间
