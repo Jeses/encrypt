@@ -4,15 +4,13 @@
     "type": "library",
     "keywords": ["laravel", "api", "sign", "verify", "encrypt","SM4"],
     "homepage": "https://github.com/Jeses/encrypt.git",
-    "version": "1.1.0",
     "require": {
         "php": "^7.3|^8.0",
         "firebase/php-jwt": "^6.0",
         "ext-json": "*"
     },
     "require-dev": {
-        "php": "^7.3|^8.0",
-        "firebase/php-jwt": "^6.0"
+        "phpunit/phpunit": "^9.5"
     },
     "authors": [
         {
