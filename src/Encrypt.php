@@ -208,6 +208,8 @@ class Encrypt
 		foreach ($data as $key => $val) {
 			if (is_array($val) || is_object($val)) {
 				$val = json_encode($val, JSON_UNESCAPED_SLASHES);
+				$val = json_decode($val, true);
+				$val = json_encode($val, JSON_UNESCAPED_UNICODE);
 			} else {
 				$val = strval($val);
 			}
