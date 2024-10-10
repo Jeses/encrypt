@@ -30,7 +30,7 @@ class Encrypt
 	{
 		$this->TOKEN_KEY = $config['TOKEN_KEY'];
 		$this->TOKEN_EXPIRE = $config['TOKEN_EXPIRE'];
-		$this->TOKEN_RENEW = $config['TOKEN_RENEW'];
+		$this->TOKEN_RENEW = false;
 		$this->TOKEN_PREFIX = $config['TOKEN_PREFIX'];
 		$this->TOKEN_ISS = $config['TOKEN_ISS'];
 		$this->TOKEN_ALG = $config['TOKEN_ALG'];
@@ -116,17 +116,17 @@ class Encrypt
 			throw new Exception('当前token无效.', 90001);
 		}
 
-		// 重置缓存，延长有效时间
+		$maxExpire = $this->TOKEN_EXPIRE * 3;
+		if ($payload->exp < time() && (time() - $payload->exp) > $maxExpire) {
+			throw new Exception('当前token已超过最长有效期,请重新登录.', 90002);
+		}
+
+		//  此逻辑无用因为token已经存在了有效时间 重置缓存，延长有效时间
 		if ($this->TOKEN_RENEW) {
 			try {
 				Cache::put(sprintf($this->TOKEN_PREFIX, $payload->layered, $payload->userId), $token, $this->TOKEN_EXPIRE);
 			} catch (\Exception $exception) {
 				throw new Exception('无法续期缓存,请自行续期', 99999);
-			}
-		}else{
-			$maxExpire = $this->TOKEN_EXPIRE * 3;
-			if ($payload->exp < time() && (time() - $payload->exp) > $maxExpire) {
-				throw new Exception('当前token已超过最长有效期,请重新登录.', 90002);
 			}
 		}
 
